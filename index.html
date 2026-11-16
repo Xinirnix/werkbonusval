@@ -3,11 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Hoeveel van je opslag hou je netto over? Interactieve grafiek over de afbouw van de werkbonus voor Belgische bedienden (2026).">
-<meta property="og:title" content="De werkbonusval">
-<meta property="og:description" content="Hoeveel van je opslag hou je netto over? De afbouw van de werkbonus bij lage lonen, interactief (NL/FR/EN).">
+<meta name="description" content="Hoeveel van je loonsverhoging hou je netto over? Interactieve grafiek over de afbouw van de werkbonus voor Belgische bedienden met een laag loon (tarieven 2026). Ook in het Frans en Engels.">
+<link rel="canonical" href="https://xinirnix.github.io/werkbonusval/">
+<meta property="og:title" content="De werkbonusval: hoeveel van je opslag hou je netto over?">
+<meta property="og:description" content="Bij een brutoloon tussen 2.300 en 2.938 euro hou je maar 16% van een opslag over. Interactief, met bronnen (NL/FR/EN).">
 <meta property="og:url" content="https://xinirnix.github.io/werkbonusval/">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="nl_BE">
+<meta property="og:locale:alternate" content="fr_BE">
+<meta property="og:locale:alternate" content="en_GB">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"De werkbonusval","url":"https://xinirnix.github.io/werkbonusval/","applicationCategory":"FinanceApplication","inLanguage":["nl","fr","en"],"description":"Bruto-netto rekenhulp die toont welk deel van een loonsverhoging een Belgische bediende netto overhoudt door de afbouw van de werkbonus (2026).","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>De werkbonusval</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -74,6 +80,7 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .note{color:var(--muted);font-size:13px}
 a{color:var(--accent)}
 ul{margin:0;padding-left:20px;display:grid;gap:4px}
+.foot{text-align:center;color:var(--muted);font-size:13px;font-family:var(--mono)}
 </style>
 </head>
 <body>
@@ -87,70 +94,71 @@ ul{margin:0;padding-left:20px;display:grid;gap:4px}
     </div>
     <div class="toolbar">
       <span class="toast" id="toast" aria-live="polite"></span>
-      <button class="share" id="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span data-t="share"></span></button>
+      <button class="share" id="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"></path></svg><span data-t="share">Delen</span></button>
     </div>
   </div>
 
   <header style="display:grid;gap:8px">
-    <div class="eyebrow" data-t="eyebrow"></div>
-    <h1 data-t="h1"></h1>
-    <p class="sub" data-t="sub"></p>
-    <p class="lede" data-t="lede"></p>
+    <div class="eyebrow" data-t="eyebrow">Bediende · voltijds · alleenstaand · tarieven 2026</div>
+    <h1 data-t="h1">De werkbonusval</h1>
+    <p class="sub" data-t="sub">Hoeveel van je opslag hou je netto over?</p>
+    <p class="lede" data-t="lede">Bij lage lonen bouwt de werkbonus af naarmate je brutoloon stijgt. Daardoor betaal je meer RSZ én verlies je een deel van de fiscale werkbonus, bovenop de gewone belasting. Vul een startloon in en zie welk deel van een brutoverhoging netto in je zak blijft.</p>
   </header>
 
   <section class="panel" aria-labelledby="wl">
     <div class="controls">
       <div>
-        <label id="wl" for="wage" data-t="wageLbl"></label>
+        <label id="wl" for="wage" data-t="wageLbl">Bruto maandloon vóór de opslag (€)</label>
         <input id="wage" type="number" min="1500" max="6000" step="10" value="2500">
-        <input id="wageR" type="range" min="1500" max="6000" step="5" value="2500" data-t-aria="wageSlider">
+        <input id="wageR" type="range" min="1500" max="6000" step="5" value="2500" data-t-aria="wageSlider" aria-label="Bruto maandloon schuifregelaar">
       </div>
       <div>
-        <span class="lbl" id="fbl" data-t="fbLbl"></span>
+        <span class="lbl" id="fbl" data-t="fbLbl">Fiscale werkbonus luik B (zeer lage lonen)</span>
         <div class="seg" role="group" aria-labelledby="fbl">
-          <button id="fb63" aria-pressed="true" data-t="fb63"></button>
-          <button id="fb52" aria-pressed="false" data-t="fb52"></button>
+          <button id="fb63" aria-pressed="true" data-t="fb63">63% (2026)</button>
+          <button id="fb52" aria-pressed="false" data-t="fb52">52,54% (oud)</button>
         </div>
       </div>
     </div>
-    <div class="stats" id="stats"></div>
-    <div class="peak" id="peak"></div>
+    <div class="stats" id="stats"><div class="stat"><div class="k">Netto per maand</div><div class="v">€&nbsp;2.167,48</div></div><div class="stat"><div class="k">Persoonlijke RSZ</div><div class="v">€&nbsp;81,03</div></div><div class="stat"><div class="k">Bedrijfsvoorheffing</div><div class="v">€&nbsp;229,47</div></div><div class="stat"><div class="k">€10 opslag, je houdt</div><div class="v alarm">16,2%</div></div><div class="stat"><div class="k">€100 opslag, je houdt</div><div class="v alarm">16,2%</div></div></div>
+    <div class="peak" id="peak"><b>Slechtste punt: je houdt maar 16,2% over.</b> Dat geldt voor elke opslag die volledig binnen €&nbsp;2.300,62 tot €&nbsp;2.937,93 bruto blijft, de zone waar luik B van de werkbonus afbouwt. Voorbeeld: van €&nbsp;2.500 naar €&nbsp;2.600 bruto levert €&nbsp;16,18 netto op. Van elke extra euro gaat 83,8% naar extra RSZ, belasting en wegvallende fiscale werkbonus. Een loon boven de werkbonuszones (bv. €3.500) houdt 44,0% van dezelfde opslag over.</div>
   </section>
 
   <section class="panel explain">
-    <h2 data-t="exH"></h2>
-    <p data-t="exP1"></p>
-    <p data-t="exP2"></p>
-    <div class="support" id="support"></div>
+    <h2 data-t="exH">Is het echt een val?</h2>
+    <p data-t="exP1">Niet helemaal. Wie weinig verdient, krijgt via de werkbonus steun van de overheid: je betaalt minder of geen persoonlijke RSZ, en je betaalt ook minder bedrijfsvoorheffing (de fiscale werkbonus). Je netto loon ligt daardoor hoger dan wat je brutoloon alleen zou opleveren. De overheid legt dus bij op wat de arbeidsmarkt betaalt.</p>
+    <p data-t="exP2">Krijg je opslag, dan bouwt die steun stap voor stap af. Je netto loon stijgt nog altijd, maar trager, omdat de overheid haar bijdrage terugneemt naarmate je werkgever meer betaalt. Wat aanvoelt als een zware belasting op je opslag, is vooral het einde van een steunmaatregel. Boven €3.403,62 bruto is de werkbonus volledig weg en houd je weer het gewone deel van een opslag over.</p>
+    <div class="support" id="support">Bij €&nbsp;2.500 bruto krijg je <b>€&nbsp;362,44 per maand</b> aan werkbonus: €&nbsp;245,72 minder RSZ en €&nbsp;116,72 minder bedrijfsvoorheffing.</div>
   </section>
 
   <section class="panel">
-    <h2 data-t="c1H"></h2>
-    <p class="note" data-t="c1N"></p>
+    <h2 data-t="c1H">Jouw opslag: welk percentage blijft netto over?</h2>
+    <p class="note" data-t="c1N">Horizontaal de brutoverhoging per maand, verticaal het deel dat je netto overhoudt. De punten staan op €5, 10, 20, 50, 100 en 200.</p>
     <div class="chart" id="c1"></div>
-    <div class="tip" id="t1"></div>
+    <div class="tip" id="t1">Beweeg over de grafiek voor details.</div>
   </section>
 
   <section class="panel">
-    <h2 data-t="c2H"></h2>
-    <p class="note" data-t="c2N"></p>
+    <h2 data-t="c2H">Elke euro opslag, per loonniveau</h2>
+    <p class="note" data-t="c2N">Wat je overhoudt van een kleine opslag (€10) bij elk startloon. De ingekleurde zones zijn waar de werkbonus afbouwt.</p>
     <div class="chart" id="c2"></div>
     <div class="tip" id="t2">&nbsp;</div>
   </section>
 
   <section class="panel">
-    <h2 data-t="c3H"></h2>
-    <p class="note" data-t="c3N"></p>
-    <div class="legend"><span>≤10%</span><span class="bar"></span><span>≥65%</span><span id="hmr"></span></div>
+    <h2 data-t="c3H">Heatmap: startloon × opslag</h2>
+    <p class="note" data-t="c3N">Elke cel is het netto deel van een opslag. Rood is waar je het minst overhoudt. De stippellijn is jouw startloon.</p>
+    <div class="legend"><span>≤10%</span><span class="bar"></span><span>≥65%</span><span id="hmr">(16,2% tot 100,0%)</span></div>
     <div class="chart" id="c3"></div>
     <div class="tip" id="t3">&nbsp;</div>
   </section>
 
   <section class="panel">
-    <h2 data-t="mH"></h2>
-    <div class="tbl"><table id="mtable"></table></div>
-    <ul class="note" id="mnotes"></ul>
+    <h2 data-t="mH">Hoe het berekend is</h2>
+    <div class="tbl"><table id="mtable"><tbody><tr><th>Onderdeel</th><th>Waarde gebruikt</th><th>Bron</th></tr><tr><td>Persoonlijke RSZ</td><td class="n">13,07% van bruto</td><td>RSZ</td></tr><tr><td>Sociale werkbonus luik B</td><td class="n">€171,99 tot €2.300,62; −0,2699 per € tot €2.937,93</td><td><a href="https://www.securex.be/nl/lex4you/werkgever/actuele-bedragen/sociaalrechtelijke-bedragen/werkbonus" target="_blank" rel="noopener">Securex</a>, <a href="https://www.socialsecurity.be/employer/instructions/dmfa/nl/latest/instructions/deductions/workers_reductions/workbonus.html" target="_blank" rel="noopener">RSZ-instructies</a> (bedienden, vanaf 1/9/2026)</td></tr><tr><td>Sociale werkbonus luik A</td><td class="n">€127,54 tot €2.937,93; −0,2739 per € tot €3.403,62</td><td>idem</td></tr><tr><td>Fiscale werkbonus (in bedrijfsvoorheffing)</td><td class="n">33,14% van luik A; 63% van luik B</td><td><a href="https://www.securex.be/nl/lex4you/werkgever/nieuws/fiscale-werkbonus-versterkt-vanaf-inkomstenjaar-2026" target="_blank" rel="noopener">Securex</a>, <a href="https://blog.forumforthefuture.be/nl/article/bericht-aan-de-schuldenaars-van-bedrijfsvoorheffing-wijzigingen-/32055" target="_blank" rel="noopener">KB 24/7/2026</a></td></tr><tr><td>Forfaitaire beroepskosten</td><td class="n">30%, max €6.070/jaar</td><td><a href="https://www.pv.be/documents/d/zap-info/pv-fiscale_maxima_2026" target="_blank" rel="noopener">PV fiscale maxima 2026</a></td></tr><tr><td>Belastingschaal voorheffing</td><td class="n">26,75% / 42,80% / 48,15% / 53,50%, grenzen €16.720 / €29.510 / €51.070</td><td>Bijlage III KB/WIB 92; grenzen inkomstenjaar 2026 (PV)</td></tr><tr><td>Belastingvrije som</td><td class="n">€11.170 (vermindering €2.987,98/jaar)</td><td><a href="https://www.securex.be/nl/lex4you/werkgever/themas/verlonen/fiscale-loonlasten-bedrijfsvoorheffing/maandelijkse-bezoldigingen-(en-ermee-gelijkgestelde-inkomsten,-met-uitzondering-van-vervangingsinkom" target="_blank" rel="noopener">Securex</a></td></tr><tr><td>Bijzondere bijdrage sociale zekerheid</td><td class="n">0 tot €1.945,38; 7,6% tot €2.190,18; €18,60 + 1,1%; max €60,94</td><td>RSZ, tabel alleenstaande</td></tr></tbody></table></div>
+    <ul class="note" id="mnotes"><li>Dit is de maandelijkse inhouding (bedrijfsvoorheffing), niet de definitieve jaarbelasting. De sleutelformule van Bijlage III is benaderd: belastbaar maandloon × 12, min beroepskosten, schaal, min belastingvrije som, gedeeld door 12. Netto-bedragen kunnen enkele euro's afwijken van een officiële loonberekening. De percentages in de werkbonuszones volgen rechtstreeks uit de wettelijke coëfficiënten.</li><li>Geen maaltijdcheques, vakantiegeld, eindejaarspremie of woon-werkvergoeding. Arbeiders hebben andere werkbonusbedragen en vallen hier buiten.</li><li>Het luik-B-percentage van de fiscale werkbonus steeg in 2026 van 52,54% naar 63%. Met de knop bovenaan zie je beide.</li></ul>
   </section>
+  <footer class="foot" id="foot" hidden=""><span id="visits"></span></footer>
 </div>
 
 <script>
@@ -165,7 +173,7 @@ const SRC={
 const A=(u,t)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
 
 const T={
-nl:{loc:'nl-BE',title:'De werkbonusval',share:'Delen',copied:'Link gekopieerd',copyFail:'Kopieer deze link: ',
+nl:{loc:'nl-BE',title:'De werkbonusval',share:'Delen',copied:'Link gekopieerd',copyFail:'Kopieer deze link: ',visits:n=>`${n} bezoekers sinds de lancering op 16 november 2026`,
  eyebrow:'Bediende · voltijds · alleenstaand · tarieven 2026',h1:'De werkbonusval',sub:'Hoeveel van je opslag hou je netto over?',
  lede:'Bij lage lonen bouwt de werkbonus af naarmate je brutoloon stijgt. Daardoor betaal je meer RSZ én verlies je een deel van de fiscale werkbonus, bovenop de gewone belasting. Vul een startloon in en zie welk deel van een brutoverhoging netto in je zak blijft.',
  wageLbl:'Bruto maandloon vóór de opslag (€)',wageSlider:'Bruto maandloon schuifregelaar',fbLbl:'Fiscale werkbonus luik B (zeer lage lonen)',fb63:'63% (2026)',fb52:'52,54% (oud)',
@@ -195,7 +203,7 @@ nl:{loc:'nl-BE',title:'De werkbonusval',share:'Delen',copied:'Link gekopieerd',c
   'Geen maaltijdcheques, vakantiegeld, eindejaarspremie of woon-werkvergoeding. Arbeiders hebben andere werkbonusbedragen en vallen hier buiten.',
   'Het luik-B-percentage van de fiscale werkbonus steeg in 2026 van 52,54% naar 63%. Met de knop bovenaan zie je beide.']},
 
-fr:{loc:'fr-BE',title:'Le piège du bonus à l\'emploi',share:'Partager',copied:'Lien copié',copyFail:'Copiez ce lien : ',
+fr:{loc:'fr-BE',title:'Le piège du bonus à l\'emploi',share:'Partager',copied:'Lien copié',copyFail:'Copiez ce lien : ',visits:n=>`${n} visiteurs depuis le lancement le 16 novembre 2026`,
  eyebrow:'Employé · temps plein · isolé · barèmes 2026',h1:'Le piège du bonus à l\'emploi',sub:'Combien de votre augmentation gardez-vous en net ?',
  lede:'Pour les bas salaires, le bonus à l\'emploi diminue à mesure que le salaire brut augmente. Vous payez donc plus d\'ONSS et perdez une partie du bonus à l\'emploi fiscal, en plus de l\'impôt normal. Indiquez un salaire de départ et voyez quelle part d\'une augmentation brute vous reste en net.',
  wageLbl:'Salaire brut mensuel avant l\'augmentation (€)',wageSlider:'Curseur du salaire brut mensuel',fbLbl:'Bonus à l\'emploi fiscal, volet B (très bas salaires)',fb63:'63 % (2026)',fb52:'52,54 % (ancien)',
@@ -225,7 +233,7 @@ fr:{loc:'fr-BE',title:'Le piège du bonus à l\'emploi',share:'Partager',copied:
   'Sans chèques-repas, pécule de vacances, prime de fin d\'année ni intervention domicile-travail. Les ouvriers ont d\'autres montants de bonus et ne sont pas couverts ici.',
   'Le pourcentage fiscal du volet B est passé en 2026 de 52,54 % à 63 %. Le bouton en haut permet de comparer les deux.']},
 
-en:{loc:'en-IE',title:'The work bonus trap',share:'Share',copied:'Link copied',copyFail:'Copy this link: ',
+en:{loc:'en-IE',title:'The work bonus trap',share:'Share',copied:'Link copied',copyFail:'Copy this link: ',visits:n=>`${n} visitors since launch on 16 November 2026`,
  eyebrow:'Belgian white-collar employee · full-time · single · 2026 rates',h1:'The work bonus trap',sub:'How much of your pay raise do you keep?',
  lede:'For low wages in Belgium, the work bonus (werkbonus / bonus à l\'emploi) is phased out as gross pay rises. You pay more social security and lose part of the tax work bonus, on top of normal income tax. Enter a starting wage and see what share of a gross raise you keep as net pay.',
  wageLbl:'Gross monthly wage before the raise (€)',wageSlider:'Gross monthly wage slider',fbLbl:'Tax work bonus, part B (very low wages)',fb63:'63% (2026)',fb52:'52.54% (old)',
@@ -345,7 +353,13 @@ function applyStatic(){
  $('mtable').innerHTML=`<tr>${t.th.map(h=>`<th>${h}</th>`).join('')}</tr>`+t.rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
  $('mnotes').innerHTML=t.notes.map(n=>`<li>${n}</li>`).join('');
  document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===LANG));
+ showVisits();
 }
+let VIS=null;
+function showVisits(){if(!VIS)return;const f=new Intl.NumberFormat(L().loc);$('visits').textContent=L().visits(f.format(VIS.c));$('foot').hidden=false}
+function loadVisits(){if(!/github\.io$/.test(location.hostname))return;
+ const toN=s=>+String(s).replace(/[^0-9]/g,'');
+ fetch('https://xinirnix.goatcounter.com/counter/TOTAL.json').then(r=>r.ok?r.json():null).then(j=>{if(j){VIS={c:toN(j.count)};showVisits()}}).catch(()=>{})}
 function render(){
  const t=L(),n=net(W),k10=kept(W,10),k100=kept(W,100);
  $('stats').innerHTML=[[t.stNet,eur(n.net)],[t.stRsz,eur(n.rsz)],[t.stBv,eur(n.bv)],[t.st10,pct(k10),k10<.35],[t.st100,pct(k100),k100<.35]]
@@ -371,7 +385,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
 new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 (function init(){const h=location.hash.slice(1);let l=T[h]?h:null;
  if(!l){const nl=(navigator.language||'nl').slice(0,2).toLowerCase();l=nl==='fr'?'fr':nl==='nl'?'nl':'nl'}
- setLang(l,false)})();
+ setLang(l,false);loadVisits()})();
 </script>
 <script data-goatcounter="https://xinirnix.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

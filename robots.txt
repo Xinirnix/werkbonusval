@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://xinirnix.github.io/werkbonusval/sitemap.xml
