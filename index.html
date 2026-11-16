@@ -3,13 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Hoeveel van je opslag hou je netto over? Interactieve grafiek over de afbouw van de werkbonus voor Belgische bedienden (2026).">
+<meta property="og:title" content="De werkbonusval">
+<meta property="og:description" content="Hoeveel van je opslag hou je netto over? De afbouw van de werkbonus bij lage lonen, interactief (NL/FR/EN).">
+<meta property="og:url" content="https://xinirnix.github.io/werkbonusval/">
+<meta property="og:type" content="website">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>De werkbonusval</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: single reading column; controls band, then three stacked charts, then assumptions. */
+/* Layout: single reading column; header with language + share, controls band, explanation, three stacked charts, method. */
 :root{
   --bg:#f6f7fb; --panel:#ffffff; --fg:#151a2d; --muted:#5b6380; --line:#dde1ec;
   --accent:#2747c9; --alarm:#c8361d; --ok:#14806b; --soft:#eef1fb;
@@ -23,22 +28,28 @@
   --bg:#0f1220; --panel:#171b2e; --fg:#e8ebf7; --muted:#9aa2c0; --line:#2a3050;
   --accent:#7d95ff; --alarm:#ff7a5c; --ok:#4cc7a6; --soft:#1e2340; color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
-.wrap{max-width:980px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+.wrap{max-width:980px;margin:0 auto;padding-block:20px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 h1,h2{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
-h1{font-size:clamp(26px,4.4vw,38px)}
+h1{font-size:clamp(28px,4.6vw,40px)}
 h2{font-size:20px}
+.sub{font-family:var(--display);font-size:clamp(18px,2.6vw,22px);font-weight:500}
 p{margin:0;max-width:68ch}
 .lede{color:var(--muted);font-size:16px}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 section.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px;min-width:0}
+section.explain{background:var(--soft);border-color:transparent}
 .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;align-items:end}
-label{font-weight:600;font-size:13px;display:block;margin-bottom:6px}
-.wagebox{display:flex;gap:10px;align-items:center}
+label,.lbl{font-weight:600;font-size:13px;display:block;margin-bottom:6px}
 input[type=number]{font-family:var(--mono);font-size:20px;width:130px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
 input[type=range]{width:100%;accent-color:var(--accent)}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
 .seg button{font:inherit;font-size:13px;padding:7px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--accent);color:var(--panel)}
+.share{font:inherit;font-size:13px;font-weight:600;padding:7px 14px;border:1px solid var(--accent);border-radius:6px;background:var(--accent);color:var(--panel);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.share svg{width:15px;height:15px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toast{font-size:13px;color:var(--ok);min-height:1em}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .stat{background:var(--soft);border-radius:8px;padding:10px 12px}
@@ -47,44 +58,58 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .stat .v.alarm{color:var(--alarm)}
 .peak{border-left:4px solid var(--alarm);padding:12px 14px;background:var(--soft);border-radius:0 8px 8px 0}
 .peak b{color:var(--alarm)}
+.support{border-left:4px solid var(--ok);padding:10px 14px;background:var(--panel);border-radius:0 8px 8px 0}
+.support b{color:var(--ok)}
 .chart{width:100%;overflow-x:auto}
 svg{display:block;width:100%;height:auto;font-family:var(--body)}
-svg text{fill:var(--muted);font-size:11px}
+.chart svg text{fill:var(--muted);font-size:11px}
 .grid line{stroke:var(--line)}
 .tip{font-family:var(--mono);font-size:13px;color:var(--muted);min-height:1.5em}
 .legend{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
 .legend .bar{height:10px;width:220px;max-width:50vw;border-radius:3px;background:linear-gradient(90deg,var(--hm0),var(--hm1),var(--hm2),var(--hm3),var(--hm4))}
 table{border-collapse:collapse;font-size:13px;width:100%}
 td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
-td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .tbl{overflow-x:auto}
-small,.note{color:var(--muted);font-size:13px}
+.note{color:var(--muted);font-size:13px}
 a{color:var(--accent)}
-ul{margin:0;padding-left:20px}
+ul{margin:0;padding-left:20px;display:grid;gap:4px}
 </style>
 </head>
 <body>
 
 <div class="wrap">
+  <div class="topbar">
+    <div class="seg" role="group" aria-label="Taal / Language / Langue">
+      <button id="L-nl" data-lang="nl" aria-pressed="true">NL</button>
+      <button id="L-fr" data-lang="fr" aria-pressed="false">FR</button>
+      <button id="L-en" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <div class="toolbar">
+      <span class="toast" id="toast" aria-live="polite"></span>
+      <button class="share" id="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span data-t="share"></span></button>
+    </div>
+  </div>
+
   <header style="display:grid;gap:8px">
-    <div class="eyebrow">Bediende · voltijds · alleenstaand · tarieven 2026</div>
-    <h1>De werkbonusval</h1>
-    <p style="font-family:var(--display);font-size:clamp(18px,2.6vw,22px);font-weight:500">Hoeveel van je opslag hou je netto over?</p>
-    <p class="lede">Bij lage lonen verdwijnt de werkbonus naarmate je brutoloon stijgt. Daardoor betaal je plots meer RSZ én verlies je een deel van de fiscale werkbonus, bovenop de gewone belasting. Vul een startloon in en zie welk deel van een brutoverhoging netto in je zak blijft.</p>
+    <div class="eyebrow" data-t="eyebrow"></div>
+    <h1 data-t="h1"></h1>
+    <p class="sub" data-t="sub"></p>
+    <p class="lede" data-t="lede"></p>
   </header>
 
-  <section class="panel" aria-label="Instellingen">
+  <section class="panel" aria-labelledby="wl">
     <div class="controls">
       <div>
-        <label for="wage">Bruto maandloon vóór de opslag (€)</label>
-        <div class="wagebox"><input id="wage" type="number" min="1500" max="6000" step="10" value="2500"></div>
-        <input id="wageR" type="range" min="1500" max="6000" step="5" value="2500" aria-label="Bruto maandloon schuifregelaar">
+        <label id="wl" for="wage" data-t="wageLbl"></label>
+        <input id="wage" type="number" min="1500" max="6000" step="10" value="2500">
+        <input id="wageR" type="range" min="1500" max="6000" step="5" value="2500" data-t-aria="wageSlider">
       </div>
       <div>
-        <label id="fbl">Fiscale werkbonus luik B (zeer lage lonen)</label>
+        <span class="lbl" id="fbl" data-t="fbLbl"></span>
         <div class="seg" role="group" aria-labelledby="fbl">
-          <button id="fb63" aria-pressed="true">63% (2026, KB juli)</button>
-          <button id="fb52" aria-pressed="false">52,54% (oud)</button>
+          <button id="fb63" aria-pressed="true" data-t="fb63"></button>
+          <button id="fb52" aria-pressed="false" data-t="fb52"></button>
         </div>
       </div>
     </div>
@@ -92,50 +117,145 @@ ul{margin:0;padding-left:20px}
     <div class="peak" id="peak"></div>
   </section>
 
-  <section class="panel">
-    <h2>Jouw opslag: welk percentage blijft netto over?</h2>
-    <p class="note">Horizontaal de brutoverhoging per maand, verticaal het deel dat je netto overhoudt. De punten staan op €5, 10, 20, 50, 100 en 200.</p>
-    <div class="chart" id="c1"></div>
-    <div class="tip" id="t1">Beweeg over de grafiek voor details.</div>
+  <section class="panel explain">
+    <h2 data-t="exH"></h2>
+    <p data-t="exP1"></p>
+    <p data-t="exP2"></p>
+    <div class="support" id="support"></div>
   </section>
 
   <section class="panel">
-    <h2>De val zichtbaar gemaakt: elke euro opslag, per loonniveau</h2>
-    <p class="note">Wat je overhoudt van een kleine opslag (€10) bij elk startloon. De ingekleurde zones zijn waar de werkbonus afbouwt.</p>
+    <h2 data-t="c1H"></h2>
+    <p class="note" data-t="c1N"></p>
+    <div class="chart" id="c1"></div>
+    <div class="tip" id="t1"></div>
+  </section>
+
+  <section class="panel">
+    <h2 data-t="c2H"></h2>
+    <p class="note" data-t="c2N"></p>
     <div class="chart" id="c2"></div>
     <div class="tip" id="t2">&nbsp;</div>
   </section>
 
   <section class="panel">
-    <h2>Heatmap: startloon × opslag</h2>
-    <p class="note">Elke cel is het netto deel van een opslag. Rood is waar je het minst overhoudt. De stippellijn is jouw startloon.</p>
+    <h2 data-t="c3H"></h2>
+    <p class="note" data-t="c3N"></p>
     <div class="legend"><span>≤10%</span><span class="bar"></span><span>≥65%</span><span id="hmr"></span></div>
     <div class="chart" id="c3"></div>
     <div class="tip" id="t3">&nbsp;</div>
   </section>
 
   <section class="panel">
-    <h2>Hoe het berekend is</h2>
-    <div class="tbl"><table>
-      <tr><th>Onderdeel</th><th>Waarde gebruikt</th><th>Bron</th></tr>
-      <tr><td>Persoonlijke RSZ</td><td class="n">13,07% van bruto</td><td>RSZ</td></tr>
-      <tr><td>Sociale werkbonus luik B</td><td class="n">€171,99 tot €2.300,62; −0,2699 per € tot €2.937,93</td><td><a href="https://www.securex.be/nl/lex4you/werkgever/actuele-bedragen/sociaalrechtelijke-bedragen/werkbonus" target="_blank" rel="noopener">Securex</a>, <a href="https://www.socialsecurity.be/employer/instructions/dmfa/nl/latest/instructions/deductions/workers_reductions/workbonus.html" target="_blank" rel="noopener">RSZ-instructies</a> (bedienden, vanaf 1/9/2026)</td></tr>
-      <tr><td>Sociale werkbonus luik A</td><td class="n">€127,54 tot €2.937,93; −0,2739 per € tot €3.403,62</td><td>idem</td></tr>
-      <tr><td>Fiscale werkbonus (in bedrijfsvoorheffing)</td><td class="n">33,14% van luik A; 63% van luik B</td><td><a href="https://www.securex.be/nl/lex4you/werkgever/nieuws/fiscale-werkbonus-versterkt-vanaf-inkomstenjaar-2026" target="_blank" rel="noopener">Securex</a>, <a href="https://blog.forumforthefuture.be/nl/article/bericht-aan-de-schuldenaars-van-bedrijfsvoorheffing-wijzigingen-/32055" target="_blank" rel="noopener">KB 24/7/2026</a></td></tr>
-      <tr><td>Forfaitaire beroepskosten</td><td class="n">30%, max €6.070/jaar</td><td><a href="https://www.pv.be/documents/d/zap-info/pv-fiscale_maxima_2026" target="_blank" rel="noopener">PV fiscale maxima 2026</a></td></tr>
-      <tr><td>Belastingschaal voorheffing</td><td class="n">26,75% / 42,80% / 48,15% / 53,50% met grenzen €16.720 / €29.510 / €51.070</td><td>Tarieven Bijlage III (incl. gemeentebelasting); grenzen van inkomstenjaar 2026 (PV)</td></tr>
-      <tr><td>Belastingvrije som</td><td class="n">€11.170 (vermindering €2.987,98/jaar)</td><td><a href="https://www.securex.be/nl/lex4you/werkgever/themas/verlonen/fiscale-loonlasten-bedrijfsvoorheffing/maandelijkse-bezoldigingen-(en-ermee-gelijkgestelde-inkomsten,-met-uitzondering-van-vervangingsinkom" target="_blank" rel="noopener">Securex</a></td></tr>
-      <tr><td>Bijzondere bijdrage sociale zekerheid</td><td class="n">0 tot €1.945,38; 7,6% tot €2.190,18; €18,60 + 1,1%; max €60,94</td><td>RSZ, tabel alleenstaande (maandelijkse inhouding)</td></tr>
-    </table></div>
-    <ul class="note">
-      <li>Dit is de maandelijkse inhouding (bedrijfsvoorheffing), niet de definitieve jaarbelasting. De sleutelformule van Bijlage III is benaderd met jaarloon = belastbaar maandloon × 12, min beroepskosten, schaal, min belastingvrije som, gedeeld door 12. Netto-bedragen kunnen enkele euro's afwijken van een officiële loonberekening; de vorm van de curve en de percentages in de werkbonuszone volgen rechtstreeks uit de wettelijke coëfficiënten.</li>
-      <li>Geen maaltijdcheques, vakantiegeld, eindejaarspremie, woon-werkvergoeding of gemeentebelasting-afwijkingen. Arbeiders hebben andere werkbonusbedragen en vallen hier buiten.</li>
-      <li>Het luik-B-percentage van de fiscale werkbonus steeg in 2026 van 52,54% naar 63%. Met de knop bovenaan zie je beide.</li>
-    </ul>
+    <h2 data-t="mH"></h2>
+    <div class="tbl"><table id="mtable"></table></div>
+    <ul class="note" id="mnotes"></ul>
   </section>
 </div>
 
 <script>
+const SITE='https://xinirnix.github.io/werkbonusval/';
+const SRC={
+ sx:'https://www.securex.be/nl/lex4you/werkgever/actuele-bedragen/sociaalrechtelijke-bedragen/werkbonus',
+ rsz:'https://www.socialsecurity.be/employer/instructions/dmfa/nl/latest/instructions/deductions/workers_reductions/workbonus.html',
+ fw:'https://www.securex.be/nl/lex4you/werkgever/nieuws/fiscale-werkbonus-versterkt-vanaf-inkomstenjaar-2026',
+ kb:'https://blog.forumforthefuture.be/nl/article/bericht-aan-de-schuldenaars-van-bedrijfsvoorheffing-wijzigingen-/32055',
+ pv:'https://www.pv.be/documents/d/zap-info/pv-fiscale_maxima_2026',
+ bv:'https://www.securex.be/nl/lex4you/werkgever/themas/verlonen/fiscale-loonlasten-bedrijfsvoorheffing/maandelijkse-bezoldigingen-(en-ermee-gelijkgestelde-inkomsten,-met-uitzondering-van-vervangingsinkom'};
+const A=(u,t)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+
+const T={
+nl:{loc:'nl-BE',title:'De werkbonusval',share:'Delen',copied:'Link gekopieerd',copyFail:'Kopieer deze link: ',
+ eyebrow:'Bediende · voltijds · alleenstaand · tarieven 2026',h1:'De werkbonusval',sub:'Hoeveel van je opslag hou je netto over?',
+ lede:'Bij lage lonen bouwt de werkbonus af naarmate je brutoloon stijgt. Daardoor betaal je meer RSZ én verlies je een deel van de fiscale werkbonus, bovenop de gewone belasting. Vul een startloon in en zie welk deel van een brutoverhoging netto in je zak blijft.',
+ wageLbl:'Bruto maandloon vóór de opslag (€)',wageSlider:'Bruto maandloon schuifregelaar',fbLbl:'Fiscale werkbonus luik B (zeer lage lonen)',fb63:'63% (2026)',fb52:'52,54% (oud)',
+ stNet:'Netto per maand',stRsz:'Persoonlijke RSZ',stBv:'Bedrijfsvoorheffing',st10:'€10 opslag, je houdt',st100:'€100 opslag, je houdt',
+ peak:(w,lo,hi,ex,ex2,dn,lose,k35)=>`<b>Slechtste punt: je houdt maar ${w} over.</b> Dat geldt voor elke opslag die volledig binnen ${lo} tot ${hi} bruto blijft, de zone waar luik B van de werkbonus afbouwt. Voorbeeld: van ${ex} naar ${ex2} bruto levert ${dn} netto op. Van elke extra euro gaat ${lose} naar extra RSZ, belasting en wegvallende fiscale werkbonus. Een loon boven de werkbonuszones (bv. €3.500) houdt ${k35} van dezelfde opslag over.`,
+ exH:'Is het echt een val?',
+ exP1:'Niet helemaal. Wie weinig verdient, krijgt via de werkbonus steun van de overheid: je betaalt minder of geen persoonlijke RSZ, en je betaalt ook minder bedrijfsvoorheffing (de fiscale werkbonus). Je netto loon ligt daardoor hoger dan wat je brutoloon alleen zou opleveren. De overheid legt dus bij op wat de arbeidsmarkt betaalt.',
+ exP2:'Krijg je opslag, dan bouwt die steun stap voor stap af. Je netto loon stijgt nog altijd, maar trager, omdat de overheid haar bijdrage terugneemt naarmate je werkgever meer betaalt. Wat aanvoelt als een zware belasting op je opslag, is vooral het einde van een steunmaatregel. Boven €3.403,62 bruto is de werkbonus volledig weg en houd je weer het gewone deel van een opslag over.',
+ support:(g,n,tot,r,f)=>n>0.005?`Bij ${g} bruto krijg je <b>${tot} per maand</b> aan werkbonus: ${r} minder RSZ en ${f} minder bedrijfsvoorheffing.`:`Bij ${g} bruto krijg je geen werkbonus meer. Een opslag wordt hier gewoon belast.`,
+ c1H:'Jouw opslag: welk percentage blijft netto over?',c1N:'Horizontaal de brutoverhoging per maand, verticaal het deel dat je netto overhoudt. De punten staan op €5, 10, 20, 50, 100 en 200.',
+ c1X:'brutoverhoging per maand',c1Hint:'Beweeg over de grafiek voor details.',
+ c1Tip:(x,dn,k,l)=>`Opslag +${x} bruto → +${dn} netto (${k} blijft over, ${l} gaat naar RSZ/belasting)`,
+ c2H:'Elke euro opslag, per loonniveau',c2N:'Wat je overhoudt van een kleine opslag (€10) bij elk startloon. De ingekleurde zones zijn waar de werkbonus afbouwt.',
+ zB:'luik B bouwt af',zA:'luik A bouwt af',c2X:'bruto maandloon vóór de opslag',c2Tip:(g,n,k)=>`${g} bruto: netto ${n} · €10 opslag → ${k} blijft over`,
+ c3H:'Heatmap: startloon × opslag',c3N:'Elke cel is het netto deel van een opslag. Rood is waar je het minst overhoudt. De stippellijn is jouw startloon.',
+ c3X:'bruto maandloon vóór de opslag (verticaal: opslag, log-schaal)',c3Tip:(g,d,k)=>`${g} + ${d} opslag → ${k} blijft netto over`,range:(a,b)=>`(${a} tot ${b})`,
+ mH:'Hoe het berekend is',th:['Onderdeel','Waarde gebruikt','Bron'],
+ rows:[['Persoonlijke RSZ','13,07% van bruto','RSZ'],
+  ['Sociale werkbonus luik B','€171,99 tot €2.300,62; −0,2699 per € tot €2.937,93',A(SRC.sx,'Securex')+', '+A(SRC.rsz,'RSZ-instructies')+' (bedienden, vanaf 1/9/2026)'],
+  ['Sociale werkbonus luik A','€127,54 tot €2.937,93; −0,2739 per € tot €3.403,62','idem'],
+  ['Fiscale werkbonus (in bedrijfsvoorheffing)','33,14% van luik A; 63% van luik B',A(SRC.fw,'Securex')+', '+A(SRC.kb,'KB 24/7/2026')],
+  ['Forfaitaire beroepskosten','30%, max €6.070/jaar',A(SRC.pv,'PV fiscale maxima 2026')],
+  ['Belastingschaal voorheffing','26,75% / 42,80% / 48,15% / 53,50%, grenzen €16.720 / €29.510 / €51.070','Bijlage III KB/WIB 92; grenzen inkomstenjaar 2026 (PV)'],
+  ['Belastingvrije som','€11.170 (vermindering €2.987,98/jaar)',A(SRC.bv,'Securex')],
+  ['Bijzondere bijdrage sociale zekerheid','0 tot €1.945,38; 7,6% tot €2.190,18; €18,60 + 1,1%; max €60,94','RSZ, tabel alleenstaande']],
+ notes:['Dit is de maandelijkse inhouding (bedrijfsvoorheffing), niet de definitieve jaarbelasting. De sleutelformule van Bijlage III is benaderd: belastbaar maandloon × 12, min beroepskosten, schaal, min belastingvrije som, gedeeld door 12. Netto-bedragen kunnen enkele euro\'s afwijken van een officiële loonberekening. De percentages in de werkbonuszones volgen rechtstreeks uit de wettelijke coëfficiënten.',
+  'Geen maaltijdcheques, vakantiegeld, eindejaarspremie of woon-werkvergoeding. Arbeiders hebben andere werkbonusbedragen en vallen hier buiten.',
+  'Het luik-B-percentage van de fiscale werkbonus steeg in 2026 van 52,54% naar 63%. Met de knop bovenaan zie je beide.']},
+
+fr:{loc:'fr-BE',title:'Le piège du bonus à l\'emploi',share:'Partager',copied:'Lien copié',copyFail:'Copiez ce lien : ',
+ eyebrow:'Employé · temps plein · isolé · barèmes 2026',h1:'Le piège du bonus à l\'emploi',sub:'Combien de votre augmentation gardez-vous en net ?',
+ lede:'Pour les bas salaires, le bonus à l\'emploi diminue à mesure que le salaire brut augmente. Vous payez donc plus d\'ONSS et perdez une partie du bonus à l\'emploi fiscal, en plus de l\'impôt normal. Indiquez un salaire de départ et voyez quelle part d\'une augmentation brute vous reste en net.',
+ wageLbl:'Salaire brut mensuel avant l\'augmentation (€)',wageSlider:'Curseur du salaire brut mensuel',fbLbl:'Bonus à l\'emploi fiscal, volet B (très bas salaires)',fb63:'63 % (2026)',fb52:'52,54 % (ancien)',
+ stNet:'Net par mois',stRsz:'ONSS personnelle',stBv:'Précompte professionnel',st10:'Augmentation de 10 €, vous gardez',st100:'Augmentation de 100 €, vous gardez',
+ peak:(w,lo,hi,ex,ex2,dn,lose,k35)=>`<b>Pire cas : vous ne gardez que ${w}.</b> C'est le cas pour toute augmentation qui reste entièrement entre ${lo} et ${hi} brut, la zone où le volet B du bonus à l'emploi diminue. Exemple : passer de ${ex} à ${ex2} brut rapporte ${dn} net. De chaque euro supplémentaire, ${lose} part en ONSS, en impôt et en bonus fiscal perdu. Au-dessus des zones du bonus (p. ex. 3 500 €), vous gardez ${k35} de la même augmentation.`,
+ exH:'Est-ce vraiment un piège ?',
+ exP1:'Pas vraiment. Les personnes qui gagnent peu reçoivent un soutien de l\'État via le bonus à l\'emploi : elles paient moins ou pas de cotisations ONSS personnelles, et moins de précompte professionnel (le bonus à l\'emploi fiscal). Leur salaire net est donc plus élevé que ce que leur salaire brut seul donnerait. L\'État complète ce que paie le marché du travail.',
+ exP2:'En cas d\'augmentation, ce soutien diminue progressivement. Le salaire net continue d\'augmenter, mais plus lentement, car l\'État reprend sa contribution à mesure que l\'employeur paie davantage. Ce qui ressemble à un lourd impôt sur l\'augmentation est surtout la fin d\'une mesure de soutien. Au-delà de 3 403,62 € brut, le bonus a disparu et vous gardez à nouveau la part habituelle d\'une augmentation.',
+ support:(g,n,tot,r,f)=>n>0.005?`À ${g} brut, vous recevez <b>${tot} par mois</b> de bonus à l'emploi : ${r} d'ONSS en moins et ${f} de précompte en moins.`:`À ${g} brut, vous ne recevez plus de bonus à l'emploi. Une augmentation est simplement imposée.`,
+ c1H:'Votre augmentation : quel pourcentage reste en net ?',c1N:'Horizontalement l\'augmentation brute par mois, verticalement la part que vous gardez en net. Les points sont à 5, 10, 20, 50, 100 et 200 €.',
+ c1X:'augmentation brute par mois',c1Hint:'Survolez le graphique pour les détails.',
+ c1Tip:(x,dn,k,l)=>`Augmentation +${x} brut → +${dn} net (${k} reste, ${l} part en ONSS/impôt)`,
+ c2H:'Chaque euro d\'augmentation, par niveau de salaire',c2N:'Ce que vous gardez d\'une petite augmentation (10 €) pour chaque salaire de départ. Les zones colorées sont celles où le bonus diminue.',
+ zB:'volet B diminue',zA:'volet A diminue',c2X:'salaire brut mensuel avant l\'augmentation',c2Tip:(g,n,k)=>`${g} brut : net ${n} · augmentation de 10 € → ${k} reste`,
+ c3H:'Carte de chaleur : salaire × augmentation',c3N:'Chaque case montre la part nette d\'une augmentation. Le rouge indique où vous gardez le moins. La ligne pointillée est votre salaire de départ.',
+ c3X:'salaire brut mensuel avant l\'augmentation (vertical : augmentation, échelle log)',c3Tip:(g,d,k)=>`${g} + ${d} d'augmentation → ${k} reste en net`,range:(a,b)=>`(${a} à ${b})`,
+ mH:'Méthode de calcul',th:['Élément','Valeur utilisée','Source'],
+ rows:[['Cotisation ONSS personnelle','13,07 % du brut','ONSS'],
+  ['Bonus à l\'emploi social, volet B','171,99 € jusqu\'à 2 300,62 € ; −0,2699 par € jusqu\'à 2 937,93 €',A(SRC.sx,'Securex')+', '+A(SRC.rsz,'instructions ONSS')+' (employés, à partir du 1/9/2026)'],
+  ['Bonus à l\'emploi social, volet A','127,54 € jusqu\'à 2 937,93 € ; −0,2739 par € jusqu\'à 3 403,62 €','idem'],
+  ['Bonus à l\'emploi fiscal (dans le précompte)','33,14 % du volet A ; 63 % du volet B',A(SRC.fw,'Securex')+', '+A(SRC.kb,'AR 24/7/2026')],
+  ['Frais professionnels forfaitaires','30 %, max 6 070 €/an',A(SRC.pv,'PV maxima fiscaux 2026')],
+  ['Barème du précompte','26,75 % / 42,80 % / 48,15 % / 53,50 %, seuils 16 720 € / 29 510 € / 51 070 €','Annexe III AR/CIR 92 ; seuils revenus 2026 (PV)'],
+  ['Quotité exemptée d\'impôt','11 170 € (réduction de 2 987,98 €/an)',A(SRC.bv,'Securex')],
+  ['Cotisation spéciale de sécurité sociale','0 jusqu\'à 1 945,38 € ; 7,6 % jusqu\'à 2 190,18 € ; 18,60 € + 1,1 % ; max 60,94 €','ONSS, barème isolé']],
+ notes:['Il s\'agit de la retenue mensuelle (précompte professionnel), pas de l\'impôt annuel définitif. La formule-clé de l\'annexe III est approchée : salaire imposable mensuel × 12, moins frais professionnels, barème, moins quotité exemptée, divisé par 12. Les montants nets peuvent différer de quelques euros d\'un calcul officiel. Les pourcentages dans les zones du bonus découlent directement des coefficients légaux.',
+  'Sans chèques-repas, pécule de vacances, prime de fin d\'année ni intervention domicile-travail. Les ouvriers ont d\'autres montants de bonus et ne sont pas couverts ici.',
+  'Le pourcentage fiscal du volet B est passé en 2026 de 52,54 % à 63 %. Le bouton en haut permet de comparer les deux.']},
+
+en:{loc:'en-IE',title:'The work bonus trap',share:'Share',copied:'Link copied',copyFail:'Copy this link: ',
+ eyebrow:'Belgian white-collar employee · full-time · single · 2026 rates',h1:'The work bonus trap',sub:'How much of your pay raise do you keep?',
+ lede:'For low wages in Belgium, the work bonus (werkbonus / bonus à l\'emploi) is phased out as gross pay rises. You pay more social security and lose part of the tax work bonus, on top of normal income tax. Enter a starting wage and see what share of a gross raise you keep as net pay.',
+ wageLbl:'Gross monthly wage before the raise (€)',wageSlider:'Gross monthly wage slider',fbLbl:'Tax work bonus, part B (very low wages)',fb63:'63% (2026)',fb52:'52.54% (old)',
+ stNet:'Net per month',stRsz:'Employee social security',stBv:'Withholding tax',st10:'€10 raise, you keep',st100:'€100 raise, you keep',
+ peak:(w,lo,hi,ex,ex2,dn,lose,k35)=>`<b>Worst case: you keep only ${w}.</b> This holds for any raise that stays entirely between ${lo} and ${hi} gross, where part B of the work bonus phases out. Example: going from ${ex} to ${ex2} gross adds ${dn} net. Of each extra euro, ${lose} goes to extra social security, tax and lost tax work bonus. Above the work bonus zones (e.g. €3,500) you keep ${k35} of the same raise.`,
+ exH:'Is it really a trap?',
+ exP1:'Not really. People on low wages get support from the government through the work bonus: they pay less or no employee social security, and less withholding tax (the tax work bonus). Their net pay is therefore higher than their gross wage alone would give. The government tops up what the labour market pays.',
+ exP2:'When you get a raise, that support is phased out step by step. Your net pay still rises, but more slowly, because the government withdraws its top-up as your employer pays more. What feels like a heavy tax on your raise is mostly the end of a support measure. Above €3,403.62 gross the work bonus is gone and you keep the normal share of a raise again.',
+ support:(g,n,tot,r,f)=>n>0.005?`At ${g} gross you receive <b>${tot} a month</b> in work bonus: ${r} less social security and ${f} less withholding tax.`:`At ${g} gross you no longer receive a work bonus. A raise is simply taxed.`,
+ c1H:'Your raise: what percentage do you keep?',c1N:'Horizontal: the gross raise per month. Vertical: the share you keep as net pay. Dots mark €5, 10, 20, 50, 100 and 200.',
+ c1X:'gross raise per month',c1Hint:'Hover over the chart for details.',
+ c1Tip:(x,dn,k,l)=>`Raise +${x} gross → +${dn} net (${k} kept, ${l} to social security/tax)`,
+ c2H:'Every euro of raise, by wage level',c2N:'What you keep of a small raise (€10) at each starting wage. Shaded zones are where the work bonus phases out.',
+ zB:'part B phases out',zA:'part A phases out',c2X:'gross monthly wage before the raise',c2Tip:(g,n,k)=>`${g} gross: net ${n} · €10 raise → ${k} kept`,
+ c3H:'Heatmap: starting wage × raise',c3N:'Each cell is the net share of a raise. Red is where you keep the least. The dashed line is your starting wage.',
+ c3X:'gross monthly wage before the raise (vertical: raise, log scale)',c3Tip:(g,d,k)=>`${g} + ${d} raise → ${k} kept as net`,range:(a,b)=>`(${a} to ${b})`,
+ mH:'How it is calculated',th:['Item','Value used','Source'],
+ rows:[['Employee social security (RSZ/ONSS)','13.07% of gross','RSZ/ONSS'],
+  ['Social work bonus, part B','€171.99 up to €2,300.62; −0.2699 per € up to €2,937.93',A(SRC.sx,'Securex')+', '+A(SRC.rsz,'RSZ instructions')+' (white-collar, from 1/9/2026)'],
+  ['Social work bonus, part A','€127.54 up to €2,937.93; −0.2739 per € up to €3,403.62','same'],
+  ['Tax work bonus (in withholding tax)','33.14% of part A; 63% of part B',A(SRC.fw,'Securex')+', '+A(SRC.kb,'Royal Decree 24/7/2026')],
+  ['Flat-rate professional expenses','30%, max €6,070/year',A(SRC.pv,'PV tax limits 2026')],
+  ['Withholding tax scale','26.75% / 42.80% / 48.15% / 53.50%, limits €16,720 / €29,510 / €51,070','Annex III RD/ITC 92; income-year 2026 limits (PV)'],
+  ['Tax-free allowance','€11,170 (reduction €2,987.98/year)',A(SRC.bv,'Securex')],
+  ['Special social security contribution','0 up to €1,945.38; 7.6% up to €2,190.18; €18.60 + 1.1%; max €60.94','RSZ/ONSS, single-person table']],
+ notes:['This is the monthly withholding (bedrijfsvoorheffing), not the final annual tax. The Annex III key formula is approximated: taxable monthly wage × 12, minus professional expenses, tax scale, minus tax-free allowance, divided by 12. Net amounts can differ by a few euros from an official payslip. The percentages in the work bonus zones follow directly from the legal coefficients.',
+  'Excludes meal vouchers, holiday pay, year-end bonus and commuting allowance. Blue-collar workers have different work bonus amounts and are not covered.',
+  'The part B tax work bonus percentage rose in 2026 from 52.54% to 63%. Use the toggle at the top to compare.']}
+};
+
 const P={rsz:.1307,A:{max:127.54,lo:2937.93,hi:3403.62,c:.2739},B:{max:171.99,lo:2300.62,hi:2937.93,c:.2699},
  fA:.3314,fB:.63,bkPct:.30,bkMax:6070,br:[[16720,.2675],[29510,.428],[51070,.4815],[Infinity,.535]],bvs:11170};
 const wb=(p,S)=>S<=p.lo?p.max:S<=p.hi?p.max-p.c*(S-p.lo):0;
@@ -143,104 +263,115 @@ function scale(x){let t=0,pr=0;for(const[l,r]of P.br){if(x>pr)t+=(Math.min(x,l)-
 const freeTax=scale(P.bvs);
 function bbsz(g){if(g<=1945.38)return 0;if(g<=2190.18)return .076*(g-1945.38);return Math.min(60.94,18.60+.011*(g-2190.18))}
 function net(g){const rG=g*P.rsz,a=wb(P.A,g),b=wb(P.B,g),red=Math.min(rG,a+b),ra=Math.min(a,red),rb=red-ra,rsz=rG-red;
- const Y=(g-rsz)*12,ni=Y-Math.min(P.bkMax,Y*P.bkPct);let T=Math.max(0,scale(ni)-freeTax)/12;T=Math.max(0,T-(P.fA*ra+P.fB*rb));
- const bb=bbsz(g);return{rsz,bv:T,bb,net:g-rsz-T-bb}}
+ const Y=(g-rsz)*12,ni=Y-Math.min(P.bkMax,Y*P.bkPct);const T0=Math.max(0,scale(ni)-freeTax)/12;const T=Math.max(0,T0-(P.fA*ra+P.fB*rb));
+ const bb=bbsz(g);return{rsz,red,fisc:T0-T,bv:T,bb,net:g-rsz-T-bb}}
 const kept=(g,d)=>(net(g+d).net-net(g).net)/d;
 
 const $=id=>document.getElementById(id);
-const eur=(v,dec=2)=>'€'+v.toLocaleString('nl-BE',{minimumFractionDigits:dec,maximumFractionDigits:dec});
-const pct=v=>(v*100).toLocaleString('nl-BE',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+let LANG='nl',W=2500;const L=()=>T[LANG];
+const eur=(v,dec=2)=>new Intl.NumberFormat(L().loc,{style:'currency',currency:'EUR',minimumFractionDigits:dec,maximumFractionDigits:dec}).format(v);
+const pct=v=>new Intl.NumberFormat(L().loc,{style:'percent',minimumFractionDigits:1,maximumFractionDigits:1}).format(v);
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const NS='http://www.w3.org/2000/svg';
 function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
-let W=2500;
 
-function hmColor(v){ // v = kept share 0..0.7
+function hmColor(v){
  const stops=['--hm0','--hm1','--hm2','--hm3','--hm4'].map(css).map(h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)));
  const pos=[0.10,0.25,0.40,0.52,0.65];
  if(v<=pos[0])return`rgb(${stops[0]})`;if(v>=pos[4])return`rgb(${stops[4]})`;
  let i=0;while(v>pos[i+1])i++;const f=(v-pos[i])/(pos[i+1]-pos[i]);
  return`rgb(${stops[i].map((c,j)=>Math.round(c+(stops[i+1][j]-c)*f))})`}
-
-function axes(svg,x0,x1,y0,y1,X,Y,xt,yt,xf,yf){
+function axes(svg,x0,x1,y0,X,Y,xt,yt,xf,yf){
  const g=el('g',{class:'grid'},svg);
  yt.forEach(v=>{el('line',{x1:x0,x2:x1,y1:Y(v),y2:Y(v)},g);el('text',{x:x0-6,y:Y(v)+4,'text-anchor':'end'},svg).textContent=yf(v)});
  xt.forEach(v=>{el('text',{x:X(v),y:y0+16,'text-anchor':'middle'},svg).textContent=xf(v)});
- el('line',{x1:x0,x2:x1,y1:y0,y2:y0,stroke:css('--muted')},svg);
-}
+ el('line',{x1:x0,x2:x1,y1:y0,y2:y0,stroke:css('--muted')},svg)}
+const pctAxis=v=>Math.round(v*100)+'%';
 
 function chart1(){
  const c=$('c1');c.innerHTML='';const w=900,h=330,m={l:52,r:20,t:16,b:40};
- const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':'Netto deel van de opslag per opslagbedrag'},c);
+ const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':L().c1H},c);
  const maxD=300,X=d=>m.l+(d/maxD)*(w-m.l-m.r),Y=v=>m.t+(1-v)*(h-m.t-m.b);
- axes(svg,m.l,w-m.r,h-m.b,m.t,X,Y,[0,50,100,150,200,250,300],[0,.2,.4,.6,.8,1],d=>'+€'+d,v=>v*100+'%');
- el('text',{x:(m.l+w-m.r)/2,y:h-6,'text-anchor':'middle'},svg).textContent='brutoverhoging per maand';
- let d='';for(let x=1;x<=maxD;x+=1){const k=kept(W,x);d+=(x===1?'M':'L')+X(x).toFixed(1)+','+Y(Math.max(0,Math.min(1,k))).toFixed(1)}
+ axes(svg,m.l,w-m.r,h-m.b,X,Y,[0,50,100,150,200,250,300],[0,.2,.4,.6,.8,1],d=>'+'+eur(d,0),pctAxis);
+ el('text',{x:(m.l+w-m.r)/2,y:h-6,'text-anchor':'middle'},svg).textContent=L().c1X;
+ let d='';for(let x=1;x<=maxD;x++){d+=(x===1?'M':'L')+X(x).toFixed(1)+','+Y(Math.max(0,Math.min(1,kept(W,x)))).toFixed(1)}
  el('path',{d,fill:'none',stroke:css('--accent'),'stroke-width':2.5},svg);
  let lx=-99,ly=-99;[5,10,20,50,100,200].forEach(x=>{const k=kept(W,x);el('circle',{cx:X(x),cy:Y(k),r:4.5,fill:css('--panel'),stroke:css('--accent'),'stroke-width':2},svg);
   if(X(x)-lx<44&&Math.abs(Y(k)-ly)<16)return;lx=X(x);ly=Y(k);el('text',{x:X(x),y:Y(k)-10,'text-anchor':'middle',style:'fill:var(--fg);font-weight:600'},svg).textContent=pct(k)});
  const hl=el('line',{y1:m.t,y2:h-m.b,stroke:css('--muted'),'stroke-dasharray':'3 3',visibility:'hidden'},svg);
+ $('t1').textContent=L().c1Hint;
  svg.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();const x=Math.round(((e.clientX-r.left)/r.width*w-m.l)/(w-m.l-m.r)*maxD);
   if(x<1||x>maxD)return;hl.setAttribute('x1',X(x));hl.setAttribute('x2',X(x));hl.setAttribute('visibility','visible');
-  const dn=net(W+x).net-net(W).net;$('t1').textContent=`Opslag +${eur(x,0)} bruto → +${eur(dn)} netto (${pct(dn/x)} blijft over, ${pct(1-dn/x)} gaat naar RSZ/belasting)`});
+  const dn=net(W+x).net-net(W).net;$('t1').textContent=L().c1Tip(eur(x,0),eur(dn),pct(dn/x),pct(1-dn/x))});
 }
-
 function chart2(){
  const c=$('c2');c.innerHTML='';const w=900,h=300,m={l:52,r:20,t:16,b:40},lo=1800,hi=5500,D=10;
- const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':'Netto deel van €10 opslag per startloon'},c);
+ const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':L().c2H},c);
  const X=g=>m.l+(g-lo)/(hi-lo)*(w-m.l-m.r),Y=v=>m.t+(1-v)*(h-m.t-m.b);
- [[P.B.lo,P.B.hi,'werkbonus luik B bouwt af'],[P.A.lo,P.A.hi,'luik A bouwt af']].forEach(([a,b,t])=>{
+ [[P.B.lo,P.B.hi,L().zB],[P.A.lo,P.A.hi,L().zA]].forEach(([a,b,t])=>{
   el('rect',{x:X(a),y:m.t,width:X(b)-X(a),height:h-m.t-m.b,fill:css('--alarm'),opacity:.10},svg);
   el('text',{x:(X(a)+X(b))/2,y:m.t+14,'text-anchor':'middle',style:'fill:var(--alarm);font-weight:600'},svg).textContent=t});
- axes(svg,m.l,w-m.r,h-m.b,m.t,X,Y,[2000,2500,3000,3500,4000,4500,5000,5500],[0,.2,.4,.6,.8,1],g=>eur(g,0),v=>v*100+'%');
- el('text',{x:(m.l+w-m.r)/2,y:h-6,'text-anchor':'middle'},svg).textContent='bruto maandloon vóór de opslag';
+ axes(svg,m.l,w-m.r,h-m.b,X,Y,[2000,2500,3000,3500,4000,4500,5000,5500],[0,.2,.4,.6,.8,1],g=>eur(g,0),pctAxis);
+ el('text',{x:(m.l+w-m.r)/2,y:h-6,'text-anchor':'middle'},svg).textContent=L().c2X;
  let d='';for(let g=lo;g<=hi;g+=2){d+=(g===lo?'M':'L')+X(g).toFixed(1)+','+Y(kept(g,D)).toFixed(1)}
  el('path',{d,fill:'none',stroke:css('--accent'),'stroke-width':2.5},svg);
  if(W>=lo&&W<=hi){el('line',{x1:X(W),x2:X(W),y1:m.t,y2:h-m.b,stroke:css('--fg'),'stroke-dasharray':'4 3'},svg);
   el('circle',{cx:X(W),cy:Y(kept(W,D)),r:5,fill:css('--fg')},svg)}
  svg.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();const g=Math.round(lo+((e.clientX-r.left)/r.width*w-m.l)/(w-m.l-m.r)*(hi-lo));
-  if(g<lo||g>hi)return;const n=net(g);$('t2').textContent=`${eur(g,0)} bruto: netto ${eur(n.net)} · €10 opslag → ${pct(kept(g,D))} blijft over`});
+  if(g<lo||g>hi)return;$('t2').textContent=L().c2Tip(eur(g,0),eur(net(g).net),pct(kept(g,D)))});
 }
-
 function chart3(){
- const c=$('c3');c.innerHTML='';const w=900,h=360,m={l:56,r:16,t:10,b:40},lo=1800,hi=5000,nx=160,ny=60,dmin=5,dmax=400;
- const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':'Heatmap startloon tegen opslag'},c);
+ const c=$('c3');c.innerHTML='';const w=900,h=360,m={l:60,r:16,t:10,b:40},lo=1800,hi=5000,nx=160,ny=60,dmin=5,dmax=400;
+ const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':L().c3H},c);
  const X=g=>m.l+(g-lo)/(hi-lo)*(w-m.l-m.r),Yd=d=>m.t+(1-Math.log(d/dmin)/Math.log(dmax/dmin))*(h-m.t-m.b);
  const cw=(w-m.l-m.r)/nx,ch=(h-m.t-m.b)/ny;let mn=1,mx=0;
  for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const g=lo+(i+.5)*(hi-lo)/nx,dd=dmin*Math.pow(dmax/dmin,(j+.5)/ny),k=kept(g,dd);mn=Math.min(mn,k);mx=Math.max(mx,k);
   el('rect',{x:m.l+i*cw,y:m.t+(ny-1-j)*ch,width:cw+.5,height:ch+.5,fill:hmColor(k)},svg)}
- $('hmr').textContent=`(${pct(mn)} tot ${pct(mx)})`;
- [5,10,20,50,100,200,400].forEach(d=>{el('text',{x:m.l-6,y:Yd(d)+4,'text-anchor':'end'},svg).textContent='+€'+d});
+ $('hmr').textContent=L().range(pct(mn),pct(mx));
+ [5,10,20,50,100,200,400].forEach(d=>{el('text',{x:m.l-6,y:Yd(d)+4,'text-anchor':'end'},svg).textContent='+'+eur(d,0)});
  [2000,2500,3000,3500,4000,4500,5000].forEach(g=>{el('text',{x:X(g),y:h-m.b+16,'text-anchor':'middle'},svg).textContent=eur(g,0)});
- el('text',{x:(m.l+w-m.r)/2,y:h-6,'text-anchor':'middle'},svg).textContent='bruto maandloon vóór de opslag (verticaal: opslag, log-schaal)';
+ el('text',{x:(m.l+w-m.r)/2,y:h-6,'text-anchor':'middle'},svg).textContent=L().c3X;
  if(W>=lo&&W<=hi)el('line',{x1:X(W),x2:X(W),y1:m.t,y2:h-m.b,stroke:css('--fg'),'stroke-width':1.5,'stroke-dasharray':'5 3'},svg);
  svg.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*w,py=(e.clientY-r.top)/r.height*h;
   const g=Math.round(lo+(px-m.l)/(w-m.l-m.r)*(hi-lo)),fy=1-(py-m.t)/(h-m.t-m.b);if(g<lo||g>hi||fy<0||fy>1)return;
-  const dd=Math.round(dmin*Math.pow(dmax/dmin,fy));$('t3').textContent=`${eur(g,0)} + ${eur(dd,0)} opslag → ${pct(kept(g,dd))} blijft netto over`});
+  const dd=Math.round(dmin*Math.pow(dmax/dmin,fy));$('t3').textContent=L().c3Tip(eur(g,0),eur(dd,0),pct(kept(g,dd)))});
 }
+function worstK(){let b=2;for(let g=1500;g<=6000;g+=1)for(const d of[5,10,20,50,100,200])b=Math.min(b,kept(g,d));return b}
 
-function worst(){let b={k:2};for(let g=1500;g<=6000;g+=1)for(const d of[5,10,20,50,100,200]){const k=kept(g,d);if(k<b.k-1e-9)b={k,g,d}}
- // width of the plateau: wages where a €10 raise is within 0.05pp of the minimum
- let a=null,z=null;for(let g=1500;g<=6000;g++){if(kept(g,1)<=b.k+5e-4){if(a===null)a=g;z=g}}return{...b,a,z}}
-
+function applyStatic(){
+ const t=L();document.documentElement.lang=LANG;document.title=t.title;
+ document.querySelectorAll('[data-t]').forEach(e=>{const v=t[e.dataset.t];if(typeof v==='string')e.innerHTML=v});
+ document.querySelectorAll('[data-t-aria]').forEach(e=>e.setAttribute('aria-label',t[e.dataset.tAria]));
+ $('mtable').innerHTML=`<tr>${t.th.map(h=>`<th>${h}</th>`).join('')}</tr>`+t.rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+ $('mnotes').innerHTML=t.notes.map(n=>`<li>${n}</li>`).join('');
+ document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===LANG));
+}
 function render(){
- const n=net(W),k10=kept(W,10),k100=kept(W,100);
- $('stats').innerHTML=[
-  ['Netto per maand',eur(n.net)],['Persoonlijke RSZ',eur(n.rsz)],['Bedrijfsvoorheffing',eur(n.bv)],
-  ['€10 opslag, je houdt',pct(k10),k10<.35],['€100 opslag, je houdt',pct(k100),k100<.35]
- ].map(([k,v,al])=>`<div class="stat"><div class="k">${k}</div><div class="v${al?' alarm':''}">${v}</div></div>`).join('');
- const w=worst();const ex=2500,dn=net(ex+100).net-net(ex).net;
- $('peak').innerHTML=`<b>Slechtste punt: je houdt maar ${pct(w.k)} over.</b> Dat geldt voor elke opslag die volledig binnen ${eur(P.B.lo)} tot ${eur(P.B.hi)} bruto blijft, de zone waar luik B van de werkbonus afbouwt. Voorbeeld: van ${eur(ex,0)} naar ${eur(ex+100,0)} bruto levert ${eur(dn)} netto op. Van elke extra euro gaat ${pct(1-w.k)} naar extra RSZ, belasting en verloren fiscale werkbonus. Een loon boven de werkbonuszones (bv. ${eur(3500,0)}) houdt ${pct(kept(3500,100))} van dezelfde opslag over.`;
+ const t=L(),n=net(W),k10=kept(W,10),k100=kept(W,100);
+ $('stats').innerHTML=[[t.stNet,eur(n.net)],[t.stRsz,eur(n.rsz)],[t.stBv,eur(n.bv)],[t.st10,pct(k10),k10<.35],[t.st100,pct(k100),k100<.35]]
+  .map(([k,v,al])=>`<div class="stat"><div class="k">${k}</div><div class="v${al?' alarm':''}">${v}</div></div>`).join('');
+ const wk=worstK(),ex=2500,dn=net(ex+100).net-net(ex).net;
+ $('peak').innerHTML=t.peak(pct(wk),eur(P.B.lo),eur(P.B.hi),eur(ex,0),eur(ex+100,0),eur(dn),pct(1-wk),pct(kept(3500,100)));
+ $('support').innerHTML=t.support(eur(W,0),n.red+n.fisc,eur(n.red+n.fisc),eur(n.red),eur(n.fisc));
  chart1();chart2();chart3();
 }
+function setLang(l,push){if(!T[l])return;LANG=l;applyStatic();render();if(push){try{history.replaceState(null,'',l==='nl'?location.pathname+location.search:'#'+l)}catch(e){}}}
 function setW(v){W=Math.max(1500,Math.min(6000,+v||2500));$('wage').value=W;$('wageR').value=W;render()}
 $('wage').addEventListener('change',e=>setW(e.target.value));
 $('wageR').addEventListener('input',e=>setW(e.target.value));
 function setFB(v){P.fB=v;$('fb63').setAttribute('aria-pressed',v===.63);$('fb52').setAttribute('aria-pressed',v!==.63);render()}
 $('fb63').onclick=()=>setFB(.63);$('fb52').onclick=()=>setFB(.5254);
+document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang,true));
+function toast(msg){$('toast').textContent=msg;clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').textContent='',4000)}
+$('share').onclick=async()=>{const url=SITE+(LANG==='nl'?'':'#'+LANG),t=L();
+ if(navigator.share){try{await navigator.share({title:t.title,text:t.sub,url});return}catch(e){if(e&&e.name==='AbortError')return}}
+ try{await navigator.clipboard.writeText(url);toast(t.copied)}catch(e){toast(t.copyFail+url)}};
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);setLang(T[h]?h:'nl',false)});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
 new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-render();
+(function init(){const h=location.hash.slice(1);let l=T[h]?h:null;
+ if(!l){const nl=(navigator.language||'nl').slice(0,2).toLowerCase();l=nl==='fr'?'fr':nl==='nl'?'nl':'nl'}
+ setLang(l,false)})();
 </script>
 <script data-goatcounter="https://xinirnix.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

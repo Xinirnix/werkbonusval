@@ -4,4 +4,4 @@ Interactieve grafiek die toont welk deel van een bruto loonsverhoging een Belgis
 
 Live: https://xinirnix.github.io/werkbonusval/
 
-Bronnen en aannames staan onderaan de pagina. De bedrijfsvoorheffing is een benadering van de sleutelformule (Bijlage III KB/WIB 92).
+Beschikbaar in het Nederlands, Frans (#fr) en Engels (#en). Bronnen en aannames staan onderaan de pagina. De bedrijfsvoorheffing is een benadering van de sleutelformule (Bijlage III KB/WIB 92).
