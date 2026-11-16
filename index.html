@@ -58,13 +58,14 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .toast{font-size:13px;color:var(--ok);min-height:1em}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
 .stat{background:var(--soft);border-radius:8px;padding:10px 12px}
 .stat .k{font-size:12px;color:var(--muted)}
-.stat .v{font-family:var(--mono);font-size:20px;font-variant-numeric:tabular-nums}
+.stat .v{font-family:var(--mono);font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#raises{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:560px){#raises{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .stat .v.alarm{color:var(--alarm)}
-.stat .s{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.stat .s.alarm{color:var(--alarm);font-weight:600}
+.stat .s{font-size:12px;color:var(--alarm);font-weight:600;font-variant-numeric:tabular-nums}
 .rh{font-weight:600;font-size:13px;margin-top:4px}
 .peak{border-left:4px solid var(--alarm);padding:12px 14px;background:var(--soft);border-radius:0 8px 8px 0}
 .peak b{color:var(--alarm)}
@@ -126,7 +127,7 @@ ul{margin:0;padding-left:20px;display:grid;gap:4px}
     </div>
     <div class="stats" id="stats"><div class="stat"><div class="k">Netto per maand</div><div class="v">€&nbsp;2.167,48</div></div><div class="stat"><div class="k">Persoonlijke RSZ</div><div class="v">€&nbsp;81,03</div></div><div class="stat"><div class="k">Bedrijfsvoorheffing</div><div class="v">€&nbsp;229,47</div></div></div>
     <div class="rh" data-t="raiseH">Wat een opslag je netto oplevert</div>
-    <div class="stats" id="raises"><div class="stat"><div class="k">Opslag +€&nbsp;10 bruto</div><div class="v">+€&nbsp;1,62</div><div class="s alarm">16,2% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;100 bruto</div><div class="v">+€&nbsp;16,18</div><div class="s alarm">16,2% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;500 bruto</div><div class="v">+€&nbsp;85,71</div><div class="s alarm">17,1% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;1.000 bruto</div><div class="v">+€&nbsp;224,82</div><div class="s alarm">22,5% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;2.500 bruto</div><div class="v">+€&nbsp;884,42</div><div class="s">35,4% blijft over</div></div></div>
+    <div class="stats" id="raises"><div class="stat"><div class="k">Opslag +€&nbsp;10 bruto</div><div class="v">+€&nbsp;1,62</div><div class="s">16,2% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;100 bruto</div><div class="v">+€&nbsp;16,18</div><div class="s">16,2% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;500 bruto</div><div class="v">+€&nbsp;85,71</div><div class="s">17,1% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;1.000 bruto</div><div class="v">+€&nbsp;224,82</div><div class="s">22,5% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;2.500 bruto</div><div class="v">+€&nbsp;884,42</div><div class="s">35,4% blijft over</div></div><div class="stat"><div class="k">Opslag +€&nbsp;5.000 bruto</div><div class="v">+€&nbsp;1.905,76</div><div class="s">38,1% blijft over</div></div></div>
     <div class="peak" id="peak"><b>Slechtste punt: je houdt maar 16,2% over.</b> Dat geldt voor elke opslag die volledig binnen €&nbsp;2.300,62 tot €&nbsp;2.937,93 bruto blijft, de zone waar luik B van de werkbonus afbouwt. Voorbeeld: van €&nbsp;2.500 naar €&nbsp;2.600 bruto levert €&nbsp;16,18 netto op. Van elke extra euro gaat 83,8% naar extra RSZ, belasting en wegvallende fiscale werkbonus. Een loon boven de werkbonuszones (bv. €3.500) houdt 44,0% van dezelfde opslag over.</div>
   </section>
 
@@ -139,7 +140,7 @@ ul{margin:0;padding-left:20px;display:grid;gap:4px}
 
   <section class="panel">
     <h2 data-t="c1H">Jouw opslag: welk percentage blijft netto over?</h2>
-    <p class="note" data-t="c1N">Horizontaal de brutoverhoging per maand, verticaal het deel dat je netto overhoudt. Logaritmische schaal van €5 tot €2.500; de punten staan op €10, 50, 100, 200, 500, 1.000 en 2.500.</p>
+    <p class="note" data-t="c1N">Horizontaal de brutoverhoging per maand, verticaal het deel dat je netto overhoudt. Logaritmische schaal van €5 tot €5.000; de punten staan op €10, 50, 100, 200, 500, 1.000, 2.500 en 5.000.</p>
     <div class="chart" id="c1"></div>
     <div class="tip" id="t1">Beweeg over de grafiek voor details.</div>
   </section>
@@ -189,7 +190,7 @@ nl:{loc:'nl-BE',title:'De werkbonusval',share:'Delen',copied:'Link gekopieerd',c
  exP1:'Niet helemaal. Wie weinig verdient, krijgt via de werkbonus steun van de overheid: je betaalt minder of geen persoonlijke RSZ, en je betaalt ook minder bedrijfsvoorheffing (de fiscale werkbonus). Je netto loon ligt daardoor hoger dan wat je brutoloon alleen zou opleveren. De overheid legt dus bij op wat de arbeidsmarkt betaalt.',
  exP2:'Krijg je opslag, dan bouwt die steun stap voor stap af. Je netto loon stijgt nog altijd, maar trager, omdat de overheid haar bijdrage terugneemt naarmate je werkgever meer betaalt. Wat aanvoelt als een zware belasting op je opslag, is vooral het einde van een steunmaatregel. Boven €3.403,62 bruto is de werkbonus volledig weg en houd je weer het gewone deel van een opslag over.',
  support:(g,n,tot,r,f)=>n>0.005?`Bij ${g} bruto krijg je <b>${tot} per maand</b> aan werkbonus: ${r} minder RSZ en ${f} minder bedrijfsvoorheffing.`:`Bij ${g} bruto krijg je geen werkbonus meer. Een opslag wordt hier gewoon belast.`,
- c1H:'Jouw opslag: welk percentage blijft netto over?',c1N:'Horizontaal de brutoverhoging per maand, verticaal het deel dat je netto overhoudt. Logaritmische schaal van €5 tot €2.500; de punten staan op €10, 50, 100, 200, 500, 1.000 en 2.500.',
+ c1H:'Jouw opslag: welk percentage blijft netto over?',c1N:'Horizontaal de brutoverhoging per maand, verticaal het deel dat je netto overhoudt. Logaritmische schaal van €5 tot €5.000; de punten staan op €10, 50, 100, 200, 500, 1.000, 2.500 en 5.000.',
  c1X:'brutoverhoging per maand',c1Hint:'Beweeg over de grafiek voor details.',
  c1Tip:(x,dn,k,l)=>`Opslag +${x} bruto → +${dn} netto (${k} blijft over, ${l} gaat naar RSZ/belasting)`,
  c2H:'Elke euro opslag, per loonniveau',c2N:'Wat je overhoudt van een kleine opslag (€10) bij elk startloon. De ingekleurde zones zijn waar de werkbonus afbouwt.',
@@ -219,7 +220,7 @@ fr:{loc:'fr-BE',title:'Le piège du bonus à l\'emploi',share:'Partager',copied:
  exP1:'Pas vraiment. Les personnes qui gagnent peu reçoivent un soutien de l\'État via le bonus à l\'emploi : elles paient moins ou pas de cotisations ONSS personnelles, et moins de précompte professionnel (le bonus à l\'emploi fiscal). Leur salaire net est donc plus élevé que ce que leur salaire brut seul donnerait. L\'État complète ce que paie le marché du travail.',
  exP2:'En cas d\'augmentation, ce soutien diminue progressivement. Le salaire net continue d\'augmenter, mais plus lentement, car l\'État reprend sa contribution à mesure que l\'employeur paie davantage. Ce qui ressemble à un lourd impôt sur l\'augmentation est surtout la fin d\'une mesure de soutien. Au-delà de 3 403,62 € brut, le bonus a disparu et vous gardez à nouveau la part habituelle d\'une augmentation.',
  support:(g,n,tot,r,f)=>n>0.005?`À ${g} brut, vous recevez <b>${tot} par mois</b> de bonus à l'emploi : ${r} d'ONSS en moins et ${f} de précompte en moins.`:`À ${g} brut, vous ne recevez plus de bonus à l'emploi. Une augmentation est simplement imposée.`,
- c1H:'Votre augmentation : quel pourcentage reste en net ?',c1N:'Horizontalement l\'augmentation brute par mois, verticalement la part que vous gardez en net. Échelle logarithmique de 5 à 2 500 € ; les points sont à 10, 50, 100, 200, 500, 1 000 et 2 500 €.',
+ c1H:'Votre augmentation : quel pourcentage reste en net ?',c1N:'Horizontalement l\'augmentation brute par mois, verticalement la part que vous gardez en net. Échelle logarithmique de 5 à 5 000 € ; les points sont à 10, 50, 100, 200, 500, 1 000, 2 500 et 5 000 €.',
  c1X:'augmentation brute par mois',c1Hint:'Survolez le graphique pour les détails.',
  c1Tip:(x,dn,k,l)=>`Augmentation +${x} brut → +${dn} net (${k} reste, ${l} part en ONSS/impôt)`,
  c2H:'Chaque euro d\'augmentation, par niveau de salaire',c2N:'Ce que vous gardez d\'une petite augmentation (10 €) pour chaque salaire de départ. Les zones colorées sont celles où le bonus diminue.',
@@ -249,7 +250,7 @@ en:{loc:'en-IE',title:'The work bonus trap',share:'Share',copied:'Link copied',c
  exP1:'Not really. People on low wages get support from the government through the work bonus: they pay less or no employee social security, and less withholding tax (the tax work bonus). Their net pay is therefore higher than their gross wage alone would give. The government tops up what the labour market pays.',
  exP2:'When you get a raise, that support is phased out step by step. Your net pay still rises, but more slowly, because the government withdraws its top-up as your employer pays more. What feels like a heavy tax on your raise is mostly the end of a support measure. Above €3,403.62 gross the work bonus is gone and you keep the normal share of a raise again.',
  support:(g,n,tot,r,f)=>n>0.005?`At ${g} gross you receive <b>${tot} a month</b> in work bonus: ${r} less social security and ${f} less withholding tax.`:`At ${g} gross you no longer receive a work bonus. A raise is simply taxed.`,
- c1H:'Your raise: what percentage do you keep?',c1N:'Horizontal: the gross raise per month. Vertical: the share you keep as net pay. Log scale from €5 to €2,500; dots mark €10, 50, 100, 200, 500, 1,000 and 2,500.',
+ c1H:'Your raise: what percentage do you keep?',c1N:'Horizontal: the gross raise per month. Vertical: the share you keep as net pay. Log scale from €5 to €5,000; dots mark €10, 50, 100, 200, 500, 1,000, 2,500 and 5,000.',
  c1X:'gross raise per month',c1Hint:'Hover over the chart for details.',
  c1Tip:(x,dn,k,l)=>`Raise +${x} gross → +${dn} net (${k} kept, ${l} to social security/tax)`,
  c2H:'Every euro of raise, by wage level',c2N:'What you keep of a small raise (€10) at each starting wage. Shaded zones are where the work bonus phases out.',
@@ -305,12 +306,12 @@ const pctAxis=v=>Math.round(v*100)+'%';
 function chart1(){
  const c=$('c1');c.innerHTML='';const w=900,h=330,m={l:52,r:20,t:16,b:40};
  const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':L().c1H},c);
- const minD=5,maxD=2500,lg=Math.log(maxD/minD),X=d=>m.l+Math.log(d/minD)/lg*(w-m.l-m.r),Y=v=>m.t+(1-v)*(h-m.t-m.b);
- axes(svg,m.l,w-m.r,h-m.b,X,Y,[5,10,20,50,100,200,500,1000,2500],[0,.2,.4,.6,.8,1],d=>'+'+eur(d,0),pctAxis);
+ const minD=5,maxD=5000,lg=Math.log(maxD/minD),X=d=>m.l+Math.log(d/minD)/lg*(w-m.l-m.r),Y=v=>m.t+(1-v)*(h-m.t-m.b);
+ axes(svg,m.l,w-m.r,h-m.b,X,Y,[5,10,20,50,100,200,500,1000,2500,5000],[0,.2,.4,.6,.8,1],d=>'+'+eur(d,0),pctAxis);
  el('text',{x:(m.l+w-m.r)/2,y:h-6,'text-anchor':'middle'},svg).textContent=L().c1X;
  let d='';for(let i=0;i<=600;i++){const x=minD*Math.pow(maxD/minD,i/600);d+=(i===0?'M':'L')+X(x).toFixed(1)+','+Y(Math.max(0,Math.min(1,kept(W,x)))).toFixed(1)}
  el('path',{d,fill:'none',stroke:css('--accent'),'stroke-width':2.5},svg);
- let lx=-99,ly=-99;[10,50,100,200,500,1000,2500].forEach(x=>{const k=kept(W,x);el('circle',{cx:X(x),cy:Y(k),r:4.5,fill:css('--panel'),stroke:css('--accent'),'stroke-width':2},svg);
+ let lx=-99,ly=-99;[10,50,100,200,500,1000,2500,5000].forEach(x=>{const k=kept(W,x);el('circle',{cx:X(x),cy:Y(k),r:4.5,fill:css('--panel'),stroke:css('--accent'),'stroke-width':2},svg);
   if(X(x)-lx<44&&Math.abs(Y(k)-ly)<16)return;lx=X(x);ly=Y(k);el('text',{x:X(x),y:Y(k)-10,'text-anchor':'middle',style:'fill:var(--fg);font-weight:600'},svg).textContent=pct(k)});
  const hl=el('line',{y1:m.t,y2:h-m.b,stroke:css('--muted'),'stroke-dasharray':'3 3',visibility:'hidden'},svg);
  $('t1').textContent=L().c1Hint;
@@ -334,14 +335,14 @@ function chart2(){
   if(g<lo||g>hi)return;$('t2').textContent=L().c2Tip(eur(g,0),eur(net(g).net),pct(kept(g,D)))});
 }
 function chart3(){
- const c=$('c3');c.innerHTML='';const w=900,h=360,m={l:60,r:16,t:10,b:40},lo=1800,hi=5000,nx=160,ny=70,dmin=5,dmax=2500;
+ const c=$('c3');c.innerHTML='';const w=900,h=360,m={l:60,r:16,t:10,b:40},lo=1800,hi=5000,nx=160,ny=70,dmin=5,dmax=5000;
  const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img','aria-label':L().c3H},c);
  const X=g=>m.l+(g-lo)/(hi-lo)*(w-m.l-m.r),Yd=d=>m.t+(1-Math.log(d/dmin)/Math.log(dmax/dmin))*(h-m.t-m.b);
  const cw=(w-m.l-m.r)/nx,ch=(h-m.t-m.b)/ny;let mn=1,mx=0;
  for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const g=lo+(i+.5)*(hi-lo)/nx,dd=dmin*Math.pow(dmax/dmin,(j+.5)/ny),k=kept(g,dd);mn=Math.min(mn,k);mx=Math.max(mx,k);
   el('rect',{x:m.l+i*cw,y:m.t+(ny-1-j)*ch,width:cw+.5,height:ch+.5,fill:hmColor(k)},svg)}
  $('hmr').textContent=L().range(pct(mn),pct(mx));
- [5,10,20,50,100,200,500,1000,2500].forEach(d=>{el('text',{x:m.l-6,y:Yd(d)+4,'text-anchor':'end'},svg).textContent='+'+eur(d,0)});
+ [5,10,20,50,100,200,500,1000,2500,5000].forEach(d=>{el('text',{x:m.l-6,y:Yd(d)+4,'text-anchor':'end'},svg).textContent='+'+eur(d,0)});
  [2000,2500,3000,3500,4000,4500,5000].forEach(g=>{el('text',{x:X(g),y:h-m.b+16,'text-anchor':'middle'},svg).textContent=eur(g,0)});
  el('text',{x:(m.l+w-m.r)/2,y:h-6,'text-anchor':'middle'},svg).textContent=L().c3X;
  if(W>=lo&&W<=hi)el('line',{x1:X(W),x2:X(W),y1:m.t,y2:h-m.b,stroke:css('--fg'),'stroke-width':1.5,'stroke-dasharray':'5 3'},svg);
@@ -369,8 +370,8 @@ function render(){
  const t=L(),n=net(W);
  $('stats').innerHTML=[[t.stNet,eur(n.net)],[t.stRsz,eur(n.rsz)],[t.stBv,eur(n.bv)]]
   .map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
- $('raises').innerHTML=[10,100,500,1000,2500].map(d=>{const g=net(W+d).net-n.net,k=g/d,al=k<.35;
-  return`<div class="stat"><div class="k">${t.raiseLbl(eur(d,0))}</div><div class="v">+${eur(g)}</div><div class="s${al?' alarm':''}">${t.raiseSmall(pct(k))}</div></div>`}).join('');
+ $('raises').innerHTML=[10,100,500,1000,2500,5000].map(d=>{const g=net(W+d).net-n.net,k=g/d;
+  return`<div class="stat"><div class="k">${t.raiseLbl(eur(d,0))}</div><div class="v">+${eur(g)}</div><div class="s">${t.raiseSmall(pct(k))}</div></div>`}).join('');
  const wk=worstK(),ex=2500,dn=net(ex+100).net-net(ex).net;
  $('peak').innerHTML=t.peak(pct(wk),eur(P.B.lo),eur(P.B.hi),eur(ex,0),eur(ex+100,0),eur(dn),pct(1-wk),pct(kept(3500,100)));
  $('support').innerHTML=t.support(eur(W,0),n.red+n.fisc,eur(n.red+n.fisc),eur(n.red),eur(n.fisc));
